@@ -700,7 +700,7 @@ class TestAccountStatementImportSheetFile(common.TransactionCase):
         )
         with self.assertRaises(UserError):
             wizard.with_context(
-                account_statement_import_txt_xlsx_test=True
+                account_statement_import_sheet_file_test=True
             ).import_file_button()
         statement_map_offsets = self.sample_statement_map.copy(
             {
@@ -749,10 +749,20 @@ class TestAccountStatementImportSheetFile(common.TransactionCase):
                 "sheet_mapping_id": statement_map_empty_line.id,
             }
         )
-        with self.assertRaises(UserError):
-            wizard.with_context(
-                account_statement_import_txt_xlsx_test=True
-            ).import_file_button()
+        with self.assertLogs(
+            "odoo.addons.account_statement_import_sheet_file.models.account_statement_import",
+            level="WARNING",
+        ) as log:
+            with self.assertRaises(UserError):
+                wizard.import_file_button()
+
+            self.assertTrue(
+                any(
+                    "time data %r does not match format" in message
+                    for message in log.output
+                )
+            )
+
         wizard = self.AccountStatementImport.with_context(journal_id=journal.id).create(
             {
                 "statement_filename": file_name,
@@ -760,9 +770,7 @@ class TestAccountStatementImportSheetFile(common.TransactionCase):
                 "sheet_mapping_id": self.sample_statement_map.id,
             }
         )
-        wizard.with_context(
-            account_statement_import_txt_xlsx_test=True
-        ).import_file_button()
+        wizard.import_file_button()
         statement = self.AccountBankStatement.search([("journal_id", "=", journal.id)])
         self.assertEqual(len(statement), 1)
         self.assertEqual(len(statement.line_ids), 3)
