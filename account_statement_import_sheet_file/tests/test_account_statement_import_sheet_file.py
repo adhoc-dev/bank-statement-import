@@ -769,3 +769,37 @@ class TestAccountStatementImportSheetFile(common.TransactionCase):
         self.assertEqual(statement.balance_start, 0.0)
         self.assertEqual(statement.balance_end_real, 2291.5)
         self.assertEqual(statement.balance_end, 2291.5)
+
+    def test_onchange_amount_type_simple_value(self):
+        """Test that fields are reset when 'amount_type'
+        is set to 'simple_value'."""
+        self.sample_statement_map.amount_column = "Amount"
+        self.sample_statement_map.amount_type = "simple_value"
+        self.sample_statement_map._onchange_amount_type()
+        self.assertFalse(self.sample_statement_map.debit_credit_column)
+        self.assertFalse(self.sample_statement_map.amount_debit_column)
+        self.assertFalse(self.sample_statement_map.amount_credit_column)
+        self.assertEqual(self.sample_statement_map.amount_column, "Amount")
+
+    def test_onchange_amount_type_absolute_value(self):
+        """Test that fields are reset when 'amount_type'
+        is set to 'absolute_value'."""
+        self.sample_statement_map.debit_credit_column = "Amount"
+        self.sample_statement_map.amount_type = "absolute_value"
+        self.sample_statement_map._onchange_amount_type()
+        self.assertFalse(self.sample_statement_map.amount_column)
+        self.assertFalse(self.sample_statement_map.amount_debit_column)
+        self.assertFalse(self.sample_statement_map.amount_credit_column)
+        self.assertEqual(self.sample_statement_map.debit_credit_column, "Amount")
+
+    def test_onchange_amount_type_distinct_credit_debit(self):
+        """Test that fields are reset when 'amount_type'
+        is set to 'distinct_credit_debit'."""
+        self.sample_statement_map.amount_debit_column = "Debit"
+        self.sample_statement_map.amount_credit_column = "Credit"
+        self.sample_statement_map.amount_type = "distinct_credit_debit"
+        self.sample_statement_map._onchange_amount_type()
+        self.assertFalse(self.sample_statement_map.amount_column)
+        self.assertFalse(self.sample_statement_map.debit_credit_column)
+        self.assertEqual(self.sample_statement_map.amount_debit_column, "Debit")
+        self.assertEqual(self.sample_statement_map.amount_credit_column, "Credit")

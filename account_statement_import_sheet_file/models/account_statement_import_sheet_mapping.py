@@ -254,3 +254,17 @@ class AccountStatementImportSheetMapping(models.Model):
 
     def _get_column_delimiter_character(self):
         return self._decode_column_delimiter_character(self.delimiter)
+
+    @api.onchange("amount_type")
+    def _onchange_amount_type(self):
+        if self.amount_type == "simple_value":
+            self.debit_credit_column = False
+            self.amount_debit_column = False
+            self.amount_credit_column = False
+        elif self.amount_type == "absolute_value":
+            self.amount_column = False
+            self.amount_debit_column = False
+            self.amount_credit_column = False
+        elif self.amount_type == "distinct_credit_debit":
+            self.amount_column = False
+            self.debit_credit_column = False
