@@ -1,5 +1,6 @@
 # Copyright 2019 ForgeFlow, S.L.
 # Copyright 2020 CorporateHub (https://corporatehub.eu)
+# Copyright 2025 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from base64 import b64encode
@@ -55,6 +56,8 @@ class TestAccountStatementImportSheetFile(BaseCommon):
         cls.mock_mapping_comma_dot._get_float_separators.return_value = (",", ".")
         cls.mock_mapping_dot_comma = Mock()
         cls.mock_mapping_dot_comma._get_float_separators.return_value = (".", ",")
+        cls.mock_mapping_none_none = Mock()
+        cls.mock_mapping_none_none._get_float_separators.return_value = ("", "")
 
     def _data_file(self, filename, encoding=None):
         mode = "rt" if encoding else "rb"
@@ -653,6 +656,11 @@ class TestAccountStatementImportSheetFile(BaseCommon):
                 1234567.89,
                 self.mock_mapping_dot_comma,
             ),  # inverted separators
+            (
+                "123456",
+                1234.56,
+                self.mock_mapping_none_none,
+            ),  # no separator
         ]
 
         for value, expected, mock_mapping in test_cases:
