@@ -12,6 +12,7 @@
     "author": "Tecnativa, Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "installable": True,
+    "auto_install": ["account_statement_import_sheet_file"],
     "depends": [
         "account_statement_import_sheet_file",
     ],
